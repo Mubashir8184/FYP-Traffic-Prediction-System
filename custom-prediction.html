@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Date/Time Prediction - Traffic Flow System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">Traffic Flow Prediction System</h1>
+            <div class="system-status">
+                <span class="status-indicator online"></span>
+                <span class="status-text">Arduino Connected</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <div class="container">
+            <a href="index.html" class="back-btn">← Back to Dashboard</a>
+
+            <section class="form-card">
+                <h2>Predict Traffic for Specific Time</h2>
+                <form class="prediction-form" id="prediction-form">
+                    <label for="date-input">Date</label>
+                    <input type="date" id="date-input" name="date" required>
+
+                    <label for="time-input">Time</label>
+                    <input type="time" id="time-input" name="time" required>
+
+                    <button type="submit" class="btn-submit">Get Prediction</button>
+                </form>
+            </section>
+
+            <section class="prediction-section results-section" id="results-section">
+                <h2>Prediction Results</h2>
+                <div class="prediction-grid">
+                    <div class="prediction-card">
+                        <h3>Expected Vehicles</h3>
+                        <div class="prediction-value" id="result-vehicles">0</div>
+                        <span class="prediction-label">Predicted count for selected time</span>
+                    </div>
+                    <div class="prediction-card">
+                        <h3>Confidence Level</h3>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="result-confidence-bar" style="width: 0%"></div>
+                        </div>
+                        <span class="prediction-label" id="result-confidence-text">0% Confidence</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        var form = document.getElementById('prediction-form');
+        var resultsSection = document.getElementById('results-section');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var dateInput = document.getElementById('date-input').value;
+            var timeInput = document.getElementById('time-input').value;
+            if (!dateInput || !timeInput) return;
+
+            fetch('/api/predict/custom', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: dateInput, time: timeInput })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                resultsSection.classList.add('visible');
+                document.getElementById('result-vehicles').textContent = data.prediction;
+                document.getElementById('result-confidence-bar').style.width = (data.confidence || 0) + '%';
+                document.getElementById('result-confidence-text').textContent = (data.confidence || 0) + '% Confidence';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(function() {
+                resultsSection.classList.add('visible');
+                document.getElementById('result-vehicles').textContent = '--';
+                document.getElementById('result-confidence-text').textContent = 'Error loading prediction';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Traffic Flow Prediction System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">Traffic Flow Prediction System</h1>
+            <div class="system-status">
+                <span class="status-indicator online" id="arduino-status"></span>
+                <span class="status-text">Arduino Connected</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <div class="container">
+            <section class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">🚗</div>
+                    <div class="stat-content">
+                        <h3>Current Vehicles</h3>
+                        <div class="stat-number" id="current-count">0</div>
+                        <span class="stat-label">Detected Now</span>
+                    </div>
+                </div>
+
+                <div class="stat-card secondary">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <h3>Today's Total</h3>
+                        <div class="stat-number" id="daily-total">0</div>
+                        <span class="stat-label">Vehicles Counted</span>
+                    </div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-content">
+                        <h3>Peak Hour</h3>
+                        <div class="stat-number" id="peak-time">--:--</div>
+                        <span class="stat-label">Busiest Time</span>
+                    </div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-content">
+                        <h3>Prediction Accuracy</h3>
+                        <div class="stat-number" id="accuracy">0%</div>
+                        <span class="stat-label">Model Performance</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chart-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Real-Time Traffic Flow</h2>
+                        <div class="time-controls">
+                            <button class="time-btn active" data-range="1h">1 Hour</button>
+                            <button class="time-btn" data-range="6h">6 Hours</button>
+                            <button class="time-btn" data-range="24h">24 Hours</button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder chart-wrapper">
+                        <canvas id="trafficChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="prediction-section">
+                <div class="prediction-container">
+                    <h2>Prediction Analysis</h2>
+                    <div class="prediction-grid">
+                        <div class="prediction-card">
+                            <h3>Next Hour Prediction</h3>
+                            <div class="prediction-value" id="next-hour-pred">0</div>
+                            <span class="prediction-label">Expected Vehicles</span>
+                        </div>
+                        <div class="prediction-card">
+                            <h3>Confidence Level</h3>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidence-level" style="width: 0%"></div>
+                            </div>
+                            <span class="prediction-label" id="confidence-text">0% Confidence</span>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder chart-wrapper">
+                        <canvas id="predictionChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="metrics-section">
+                <h2>Machine Learning Model Performance</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>Linear Regression</h4>
+                        <div class="metric-values">
+                            <div class="metric-item">
+                                <span class="metric-label">MAE:</span>
+                                <span class="metric-value" id="lr-mae">0.00</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">RMSE:</span>
+                                <span class="metric-value" id="lr-rmse">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>Decision Tree</h4>
+                        <div class="metric-values">
+                            <div class="metric-item">
+                                <span class="metric-label">MAE:</span>
+                                <span class="metric-value" id="dt-mae">0.00</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">RMSE:</span>
+                                <span class="metric-value" id="dt-rmse">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>Random Forest</h4>
+                        <div class="metric-values">
+                            <div class="metric-item">
+                                <span class="metric-label">MAE:</span>
+                                <span class="metric-value" id="rf-mae">0.00</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">RMSE:</span>
+                                <span class="metric-value" id="rf-rmse">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="controls-section">
+                <div class="controls-container">
+                    <h2>System Controls</h2>
+                    <div class="control-buttons">
+                        <button class="btn btn-primary" id="export-data">
+                            📊 Export CSV Data
+                        </button>
+                        <button class="btn btn-secondary" id="refresh-data">
+                            🔄 Refresh Data
+                        </button>
+                        <button class="btn btn-success" id="start-prediction">
+                            🎯 Start Prediction
+                        </button>
+                        <a href="custom-prediction.html" class="btn btn-custom">
+                            📅 Custom Date/Time Prediction
+                        </a>
+                        <button class="btn btn-warning" id="calibrate-sensors">
+                            ⚙️ Calibrate Sensors
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="status-footer">
+                <div class="status-info">
+                    <div class="status-item">
+                        <span class="status-label">Last Update:</span>
+                        <span class="status-value" id="last-update">--:--:--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Data Points:</span>
+                        <span class="status-value" id="data-points">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">System Uptime:</span>
+                        <span class="status-value" id="uptime">00:00:00</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
