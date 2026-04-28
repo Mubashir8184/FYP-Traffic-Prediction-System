@@ -5,8 +5,13 @@ var trafficChart = null;
 var predictionChart = null;
 var currentRange = "24h";
 
+function getSelectedModel() {
+  var selector = document.getElementById("model-selector");
+  return selector ? selector.value : "rf";
+}
+
 function updateStats() {
-  fetch(API + "/stats")
+  return fetch(API + "/stats?model=" + getSelectedModel())
     .then(function (res) { return res.json(); })
     .then(function (data) {
       setText("current-count", data.current_count);
@@ -22,7 +27,9 @@ function updateStats() {
 }
 
 function updatePrediction() {
-  fetch(API + "/predict/next-hour")
+  var modelType = getSelectedModel();
+
+  return fetch(API + "/predict/next-hour?model=" + modelType)
     .then(function (res) { return res.json(); })
     .then(function (data) {
       setText("next-hour-pred", data.prediction);
@@ -35,15 +42,25 @@ function updatePrediction() {
 }
 
 function updateMetrics() {
-  fetch(API + "/metrics")
+  return fetch(API + "/metrics")
     .then(function (res) { return res.json(); })
     .then(function (data) {
-      setText("lr-mae", data.lr.mae);
-      setText("lr-rmse", data.lr.rmse);
-      setText("dt-mae", data.dt.mae);
-      setText("dt-rmse", data.dt.rmse);
-      setText("rf-mae", data.rf.mae);
-      setText("rf-rmse", data.rf.rmse);
+      if (data.lr) {
+        setText("lr-mae", data.lr.mae);
+        setText("lr-rmse", data.lr.rmse);
+      }
+      if (data.dt) {
+        setText("dt-mae", data.dt.mae);
+        setText("dt-rmse", data.dt.rmse);
+      }
+      if (data.rf) {
+        setText("rf-mae", data.rf.mae);
+        setText("rf-rmse", data.rf.rmse);
+      }
+      if (data.lstm) {
+        setText("lstm-mae", data.lstm.mae);
+        setText("lstm-rmse", data.lstm.rmse);
+      }
     })
     .catch(function () {});
 }
@@ -62,11 +79,18 @@ function updateUptime() {
 }
 
 function refreshAll() {
-  updateStats();
-  updatePrediction();
-  updateMetrics();
-  updateTrafficChart(currentRange);
-  updatePredictionChart();
+  var overlay = document.getElementById("loader-overlay");
+  if (overlay) overlay.classList.add("active");
+
+  Promise.allSettled([
+    updateStats(),
+    updatePrediction(),
+    updateMetrics(),
+    updateTrafficChart(currentRange),
+    updatePredictionChart()
+  ]).then(function() {
+    if (overlay) overlay.classList.remove("active");
+  });
 }
 
 function initCharts() {
@@ -95,7 +119,7 @@ function initCharts() {
 
 function updateTrafficChart(range) {
   currentRange = range || currentRange;
-  fetch(API + "/chart/traffic?range=" + (range || currentRange))
+  return fetch(API + "/chart/traffic?range=" + (range || currentRange))
     .then(function (res) { return res.json(); })
     .then(function (data) {
       if (trafficChart && data.labels && data.values) {
@@ -108,7 +132,7 @@ function updateTrafficChart(range) {
 }
 
 function updatePredictionChart() {
-  fetch(API + "/chart/prediction")
+  return fetch(API + "/chart/prediction?model=" + getSelectedModel())
     .then(function (res) { return res.json(); })
     .then(function (data) {
       if (predictionChart && data.labels) {
@@ -149,6 +173,9 @@ if (refreshBtn) refreshBtn.addEventListener("click", refreshAll);
 
 var startPredBtn = document.getElementById("start-prediction");
 if (startPredBtn) startPredBtn.addEventListener("click", updatePrediction);
+
+var modelSelector = document.getElementById("model-selector");
+if (modelSelector) modelSelector.addEventListener("change", refreshAll);
 
 var calibrateBtn = document.getElementById("calibrate-sensors");
 if (calibrateBtn) {

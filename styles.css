@@ -414,6 +414,52 @@ body {
     display: block;
 }
 
+/* Model selection dropdown */
+.prediction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 10px;
+}
+
+.model-select {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.model-select option {
+    background: #764ba2;
+    color: white;
+}
+
+/* Specific styling for custom prediction form selector */
+.prediction-form .model-select {
+    background: white;
+    color: #333;
+    border: 2px solid #e2e8f0;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.metric-card.highlight {
+    border-color: #5a67d8;
+    background: #f0f4ff;
+    box-shadow: 0 4px 12px rgba(90, 103, 216, 0.15);
+}
+
+.metric-card.highlight h4 {
+    color: #5a67d8;
+}
+
 /* Responsive design for mobile devices */
 @media (max-width: 768px) {
     .container {
@@ -443,4 +489,51 @@ body {
         flex-direction: column;
         gap: 15px;
     }
+
+    .prediction-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Loader Overlay */
+.loader-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.loader-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #e2e8f0;
+    border-top: 6px solid #5a67d8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.loader-overlay p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4a5568;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

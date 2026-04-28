@@ -24,6 +24,12 @@
             <section class="form-card">
                 <h2>Predict Traffic for Specific Time</h2>
                 <form class="prediction-form" id="prediction-form">
+                    <label for="model-input">Model</label>
+                    <select id="model-input" name="model" class="model-select">
+                        <option value="rf">Random Forest</option>
+                        <option value="lstm">LSTM (Deep Learning)</option>
+                    </select>
+
                     <label for="date-input">Date</label>
                     <input type="date" id="date-input" name="date" required>
 
@@ -61,6 +67,7 @@
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
+            var modelInput = document.getElementById('model-input').value;
             var dateInput = document.getElementById('date-input').value;
             var timeInput = document.getElementById('time-input').value;
             if (!dateInput || !timeInput) return;
@@ -68,7 +75,7 @@
             fetch('/api/predict/custom', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date: dateInput, time: timeInput })
+                body: JSON.stringify({ date: dateInput, time: timeInput, model: modelInput })
             })
             .then(function(res) { return res.json(); })
             .then(function(data) {
@@ -85,5 +92,6 @@
             });
         });
     </script>
+
 </body>
 </html>

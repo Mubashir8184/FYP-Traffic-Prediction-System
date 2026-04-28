@@ -18,6 +18,11 @@
         </div>
     </header>
 
+    <div id="loader-overlay" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        <p>Loading Data...</p>
+    </div>
+
     <main class="dashboard">
         <div class="container">
             <section class="stats-grid">
@@ -79,7 +84,13 @@
                     <h2>Prediction Analysis</h2>
                     <div class="prediction-grid">
                         <div class="prediction-card">
-                            <h3>Next Hour Prediction</h3>
+                            <div class="prediction-header">
+                                <h3>Next Hour Prediction</h3>
+                                <select id="model-selector" class="model-select">
+                                    <option value="rf">Random Forest</option>
+                                    <option value="lstm">LSTM Model</option>
+                                </select>
+                            </div>
                             <div class="prediction-value" id="next-hour-pred">0</div>
                             <span class="prediction-label">Expected Vehicles</span>
                         </div>
@@ -138,6 +149,20 @@
                             <div class="metric-item">
                                 <span class="metric-label">RMSE:</span>
                                 <span class="metric-value" id="rf-rmse">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card highlight">
+                        <h4>LSTM (Deep Learning)</h4>
+                        <div class="metric-values">
+                            <div class="metric-item">
+                                <span class="metric-label">MAE:</span>
+                                <span class="metric-value" id="lstm-mae">0.00</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">RMSE:</span>
+                                <span class="metric-value" id="lstm-rmse">0.00</span>
                             </div>
                         </div>
                     </div>
